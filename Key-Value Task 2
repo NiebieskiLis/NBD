@@ -1,0 +1,233 @@
+****** As table ******
+execute "create table PrincessMovies (Title string ,Name string, Produced_by string , Animal Array( string) , year Number, primary key (Title))"
+
+    Statement completed successfully
+
+
+
+put table -name PrincessMovies -json '{ "Title" : "Mulan" ,"Name" : "Fa_Mulan", "Produced_by" : "Walt_Disney","Animal" : ["Mushu"] ,"year" : 1998}'
+
+    Operation successful, row inserted.
+
+put table -name PrincessMovies -json '{ "Title" : "Pocahontas" , "Name" : "Pocahontas", "Produced_by" : "Walt_Disney", "Animal" : ["Meeko","Flit","Percy"],"year" : 1995 }'
+    Operation successful, row inserted.
+
+put table -name PrincessMovies -json '{"Title" : "Anastasia" , "Name" : "Anastasia", "Produced_by" : "Fox_Animation_Studio", "Animal" : ["Mucha"], "year" : 1997}'
+    Operation successful, row inserted.
+
+get table -name PrincessMovies -field Title -value "Mulan"
+    {"Title":"Mulan","Name":"Fa_Mulan","Produced_by":"Walt_Disney","Animal":["Mushu"],"year":1998}
+
+get table -name PrincessMovies -field Title -value "Pocahontas"
+    {"Title":"Pocahontas","Name":"Pocahontas","Produced_by":"Walt_Disney","Animal":["Meeko","Flit","Percy"],"year":1995}
+
+get table -name PrincessMovies -field Title -value "Anastasia"
+    {"Title":"Anastasia","Name":"Anastasia","Produced_by":"Fox_Animation_Studio","Animal":["Mucha"],"year":1997}
+ 
+
+execute "create index Producer on PrincessMovies (Produced_by)"
+
+ 
+
+get table -name PrincessMovies -index Producer -field Produced_by -value Walt_Disney
+    {"Title":"Mulan","Name":"Fa_Mulan","Produced_by":"Walt_Disney","Animal":["Mushu"],"year":1998}
+    {"Title":"Pocahontas","Name":"Pocahontas","Produced_by":"Walt_Disney","Animal":["Meeko","Flit","Percy"],"year":1995}
+
+    2 row returned
+get table -name PrincessMovies -index Producer -field Produced_by -value Fox_Animation_Studio
+
+    {"Title":"Anastasia","Name":"Anastasia","Produced_by":"Fox_Animation_Studio","Animal":["Mucha"],"year":1997}
+
+    1 row returned
+
+****** Drop Table ******
+
+execute "drop index Producer on PrincessMovies" 
+
+Statement completed successfully
+
+
+execute "drop table PrincessMovies"
+    Statement completed successfully
+
+
+
+-----------------------------------------------------------------------------------------------------
+
+****** As Objects ******
+
+put kv -key /Mulan -value '{ "Name" : "Fa_Mulan", "Produced_by" : "Walt_Disney","Animal" : "Mushu","year" : 1998}'
+    Operation successful, record inserted.
+
+get kv -key /Mulan
+    { "Name" : "Fa_Mulan", "Produced_by" : "Walt_Disney","Animal" : "Mushu","year" : 1998}
+
+put kv -key /Pocahontas -value '{ "Name" : "Pocahontas", "Produced_by" : "Walt_Disney", "Animal" : ["Meeko","Flit","Percy"],"year" : 1995 }'
+    Operation successful, record inserted.
+
+get kv -key /Pocahontas
+    { "Name" : "Pocahontas", "Produced_by" : "Walt_Disney", "Animal" : ["Meeko","Flit","Percy"],"year" : 1995 }
+
+
+
+put kv -key /Anastasia -value '{ "Name" : "Anastasia", "Produced_by" : "Fox_Animation_Studio", "Animal" : "Mucha", "year" : 1997}'
+    Operation successful, record inserted.
+get kv -key /Anastasia
+    { "Name" : "Anastasia", "Produced_by" : "Fox_Animation_Studio", "Animal" : "Mucha", "year" : 1997}
+
+ ****** IndexView Key-Value ******
+
+
+Adding Mulan
+put kv -key /ProducerIV/Walt_Disney -value '["Mulan"]'
+    Operation successful, record updated. Adding Pocahontas
+
+get kv -key /ProducerIV/Walt_Disney
+    ["Mulan"]
+
+put kv -key /ProducerIV/Walt_Disney -value '["Mulan","Pocahontas"]'
+    Operation successful, record updated.
+
+get kv -key /ProducerIV/Walt_Disney
+    ["Mulan","Pocahontas"]
+
+get kv -key /Mulan
+    { "Name" : "Fa_Mulan", "Produced_by" : "Walt_Disney","Animal" : "Mushu","year" : 1998}
+
+get kv -key /Pocahontas
+    { "Name" : "Pocahontas", "Produced_by" : "Walt_Disney", "Animal" : ["Meeko","Flit","Percy"],"year" : 1995 }
+
+
+put kv -key /ProducerIV/Fox_Animation_Studio -value '["Anastasia"]'
+    Operation successful, record inserted.
+
+get kv -key /ProducerIV/Fox_Animation_Studio
+    ["Anastasia"]
+****** Delete Keys ******
+delete kv  -key /Mulan
+    Key deleted: /Mulan
+
+delete kv  -key /Pocahontas
+    Key deleted: /Pocahontas
+
+delete kv  -key /Anastasia
+    Key deleted: /Anastasia
+******Delete IV ******
+delete kv -key /ProducerIV/Fox_Animation_Studio
+    Key deleted: /ProducerIV/Fox_Animation_Studio
+
+delete kv -key /ProducerIV/Walt_Disney
+    Key deleted: /ProducerIV/Walt_Disney
+
+----------------------------------------------------------------------------------------------------
+As atomic values
+
+******Mulan******
+
+put kv -key /Mulan/-/Name -value "Fa_Mulan"
+    Operation successful, record updated.
+
+put kv -key /Mulan/-/Produced_by -value "Walt_Disney"
+    Operation successful, record inserted.
+
+put kv -key /Mulan/-/Animal -value "Mushu"
+    Operation successful, record inserted.
+
+put kv -key /Mulan/-/year -value 1998
+    Operation successful, record inserted.
+
+
+******Anastasia******
+
+put kv -key /Anastasia/-/Name -value "Anastasia"
+    Operation successful, record inserted.
+
+put kv -key /Anastasia/-/Produced_by -value "Fox_Animation_Studio"
+    Operation successful, record inserted.
+
+put kv -key /Anastasia/-/Animal -value "Mucha"
+    Operation successful, record inserted.
+
+put kv -key /Anastasia/-/year -value 1997
+    Operation successful, record inserted.
+
+******Pocahontas******
+
+put kv -key /Pocahontas/-/Name -value "Pocahontas"
+    Operation successful, record updated.
+
+put kv -key /Pocahontas/-/Produced_by -value "Walt_Disney"
+    Operation successful, record updated.
+
+put kv -key /Pocahontas/-/Animal -value '["Meeko","Flit","Percy"]'
+    Operation successful, record updated.
+
+put kv -key /Pocahontas/-/year -value 1995
+    Operation successful, record inserted.
+
+******IndexView key-only******
+
+put kv -key /ProducerIVA/Walt_Disney/-/Mulan -value "";
+    Operation successful, record inserted.
+
+put kv -key /ProducerIVA/Walt_Disney/-/Pocahontas -value "";
+    Operation successful, record inserted.
+
+get kv -key /ProducerIVA/Walt_Disney -all
+     /ProducerIVA/Walt_Disney/-/Mulan
+     /ProducerIVA/Walt_Disney/-/Pocahontas
+
+get kv -key /Mulan  -all
+
+    /Mulan/-/Animal
+    Mushu
+    /Mulan/-/Name
+    Fa_Mulan
+    /Mulan/-/Produced_by
+    Walt_Disney
+    /Mulan/-/year
+    1998
+
+get kv -key /Pocahontas  -all
+    /Pocahontas/-/Animal
+    ["Meeko","Flit","Percy"]
+    /Pocahontas/-/Name
+    Pocahontas
+    /Pocahontas/-/Produced_by
+    Walt_Disney
+    /Pocahontas/-/year
+    1995
+
+
+
+
+put kv -key /ProducerIVA/Fox_Animation_Studio/-/Anastasia -value "";
+     Operation successful, record inserted.
+
+get kv -key /ProducerIVA/Fox_Animation_Studio -all
+    /ProducerIVA/Fox_Animation_Studio/-/Anastasia
+
+get kv -key /Anastasia  -all
+    /Anastasia/-/Animal
+    Mucha
+    /Anastasia/-/Name
+    Anastasia
+    /Anastasia/-/Produced_by
+    Fox_Animation_Studio
+    /Anastasia/-/year
+    1997
+
+ ****** Delete Keys *******
+delete kv -key /Pocahontas -all
+    4 Keys deleted starting at /Pocahontas
+delete kv -key /Mulan -all
+    4 Keys deleted starting at /Mulan
+delete kv -key /Anastasia -all
+    4 Keys deleted starting at /Anastasia
+
+****** Delete IV ******
+delete kv -key /ProducerIVA/Fox_Animation_Studio -all
+    1 Key deleted starting at /ProducerIVA/Fox_Animation_Studio
+
+delete kv -key /ProducerIVA/Walt_Disney -all
+    2 Keys deleted starting at /ProducerIVA/Walt_Disney
