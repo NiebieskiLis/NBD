@@ -1,0 +1,56 @@
+Configure a replication set with the following members:
+
+2 nodes with priority 3
+1 node delayed by an hour
+2 non-voting nodes
+After completing the task submit the following info:
+
+configuration of the replica set
+status of the replica set.
+
+-----------1 węzeł zbioru nie działał --------------
+commands
+
+--uruchomienie bazy
+mongod --port 27017 --dbpath data\db1 --replSet pracaDomowa
+mongod --port 27018 --dbpath data\db2 --replSet pracaDomowa
+mongod --port 27019 --dbpath data\db3 --replSet pracaDomowa
+mongod --port 27020 --dbpath data\db4 --replSet pracaDomowa
+mongod --port 27021 --dbpath data\db5 --replSet pracaDomowa
+
+rs.initiate()
+cfg = rs.conf()
+--2X node gdzie priority = 3
+cfg.members[0].host = " 192.168.8.196:27017"
+cfg.members[0].priority=3
+
+rs.add("192.168.8.196:27018")
+
+
+--2x non-voting
+rs.add("localhost:27019")
+rs.add("localhost:27020")
+cfg = rs.conf()
+
+cfg.members[2].priority=0
+cfg.members[2].votes=0
+
+
+cfg.members[3].priority=0
+cfg.members[3].votes=0
+
+rs.reconfig(cfg)
+
+
+--1x delayed
+
+rs.addArb("localhost:27021")
+
+cfg = rs.conf()
+--usuwamy starego arbitra
+rs.remove("localhost:27021")
+--zmieniamy starego membera z poprzedniej konfiguracji
+cfg.members[4].arbiterOnly = false
+cfg.members[4].priority=0
+cfg.members[4].slaveDelay=3600
+rs.add(cfg.members[4])
