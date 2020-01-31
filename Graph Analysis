@@ -1,0 +1,34 @@
+#Betweenness:
+
+CALL algo.betweenness.stream()
+YIELD nodeId, centrality
+MATCH (x) WHERE id(x) = nodeId
+RETURN x.Nazwa AS x, centrality
+ORDER BY centrality DESC
+LIMIT 5;
+
+#Closeness:
+
+CALL algo.closeness.stream()
+YIELD nodeId, centrality
+MATCH (x) WHERE id(x) = nodeId
+RETURN x.Nazwa as Nazwa, centrality
+ORDER BY centrality DESC
+LIMIT 5;
+
+#Degree:
+
+CALL algo.degree.stream()
+YIELD nodeId, score
+MATCH (x) WHERE id(x) = nodeId
+RETURN x.Nazwa AS Nazwa, score AS Polaczenia
+ORDER BY Polaczenia DESC
+LIMIT 5
+
+Louvain:
+
+CALL algo.louvain.stream()
+YIELD nodeId, community
+match(n) where id(n) = nodeId
+RETURN n.Nazwa AS Nazwa, community
+ORDER BY community;
