@@ -1,0 +1,105 @@
+
+-------------------
+create
+-------------------
+CREATE (Misiek : Wszystkożerne {Nazwa:'Niedźwiedź brunatny', Łacińska_nazwa : 'Ursus arctos', Kontynent : 'Północna Ameryka', Długość_ciała: 200, Waga : 200})
+CREATE (Tygrys : Mięsożerne {Nazwa:'Tygrys Azjatycki', Łacińska_nazwa : 'Panthera tigris' , Kontynent : 'Azja' , Ilość_kończyn:4 , Rząd:3})
+CREATE (Ślimaki : Roślinożerne {Nazwa:'Ślimaki', Łacińska_nazwa : 'Gastropoda' , Kontynent : 'Europa' , Ilość_kończyn:1, Rząd:3})
+CREATE (Trawa : Roślina {Nazwa:'Trawa', Łacińska_nazwa : 'Poaceae' , Kontynent : 'Wszystkie'})
+CREATE (Zając : Roślinożerne {Nazwa:'Zając', Łacińska_nazwa : 'Lepus' , Kontynent : 'Europa' , Ilość_kończyn:4 , Rząd:1})
+CREATE (Mysz : Roślinożerne {Nazwa:'Mysz ziemista', Łacinska_nazwa: 'Mus terricolor' , Kontynent : 'Azja' , Ilość_kończyn:4 , Rząd:1})
+CREATE (Mniszek : Roślina {Nazwa:'Mniszek Lekarski', Łacinska_nazwa: 'Taraxacum officinale' , Kontynent : 'Wszystkie' })
+CREATE (Kotek : Wszystkożerne {Nazwa:'Kot pustynny', Łacinska_nazwa: 'Felis margarita' , Kontynent : 'Afryka' , Ilość_kończyn:4 , Rząd:2 , Długość_ciała:48 ,Waga:2.5 })
+CREATE (Wydra : Mięsożerne {Nazwa:'Wydra', Łacinska_nazwa: 'Lutra' , Kontynent : 'Eurazja' , Ilość_kończyn:4 , Rząd:3 ,  Długość_ciała:80 ,Waga:9})
+CREATE (Kleszcz : Pasożyt {Nazwa:'Kleszcz', Łacinska_nazwa: 'Ixodida' , Kontynent : 'Europa' , Ilość_kończyn:8,  Długość_ciała:0.3 })
+CREATE (Wilk : Mięsożerne {Nazwa:'Wilk szary', Łacinska_nazwa: 'Canis lupus' , Kontynent : 'Eurazja' , Ilość_kończyn:4, Waga:67 ,  Długość_ciała:170 })
+CREATE (Pies : Wszystkożerne {Nazwa:'Piesek', Łacinska_nazwa: 'Golden Retriever' , Kontynent : 'Wszystkie' , Ilość_kończyn:4, Waga:35 ,  Długość_ciała:170 })
+CREATE (Małpa : Wszystkożerne {Nazwa: 'Nosacz sundajski', Łacinska_nazwa: 'Nasalis larvatus' , Kontynent : 'Azja', Ilość_kończyn:4, Waga:35 ,  Długość_ciała:140 })
+CREATE (Świnia : Wszystkożerne {Nazwa:'Świnia domowa', Łacinska_nazwa: 'Sus scrofa f. domestica' , Kontynent : 'Wszystkie', Ilość_kończyn:4, Waga:200 ,  Długość_ciała:150 })
+CREATE (Ryby : Roślinożerne {Nazwa: 'Rybki', Kontynent : 'Wszystkie'})
+CREATE (Krowa : Roślinożerne {Nazwa: 'Krowa', Łacinska_nazwa: 'Bos taurus taurus' , Kontynent : 'Wszystkie', Ilość_kończyn:4, Waga:800 ,  Długość_ciała:250 })
+CREATE (Mleko : Produkty {Nazwa: 'Mleko', Smak: 'Smaczne', Zawartość_tłuszczu : 3.4})
+CREATE (Człowiek : Wszystkożerne {Nazwa:'Człowiek', Łacińska_nazwa : 'Homo Sapiens' , Kontynent : 'Wszystkie' , Ilość_kończyn:4 ,Rząd:3, Długość_ciała:170, Waga: 70})
+
+CREATE (Wilk)- [:JE {Kiedy : ['Jak zaatakuje']}] ->(Człowiek)
+CREATE (Wilk)- [:JE {Kiedy : ['Jako przystawkę']}] ->(Zając)
+CREATE (Kleszcz)- [:PASOŻYTUJE_NA {Gdzie_atakuje : ['na polanie']}] ->(Pies)
+CREATE (Kleszcz)- [:PASOŻYTUJE_NA {Gdzie_atakuje : ['Spada z drzewa']}] ->(Człowiek)
+CREATE (Kleszcz)- [:PASOŻYTUJE_NA {Gdzie_atakuje : ['Gdy chodzi po lesie']}] ->(Kotek)
+CREATE (Małpa)- [:JE {Kiedy : ['Gdy iska inną małpkę']}] ->(Kleszcz)
+CREATE (Krowa)- [:PRODUKUJE {Ile : ['Jak zaatakuje']}] ->(Mleko)
+CREATE (Krowa)- [:JE {Kiedy : ['Codziennie na łące']}] ->(Trawa)
+CREATE (Krowa)- [:JE {Kiedy : ['Jak uda jej się znaleźć']}] ->(Mniszek)
+CREATE (Człowiek)- [:OPIEKUJE_SIE {Jak : ['Karmi']}] ->(Kotek)
+CREATE (Człowiek)- [:OPIEKUJE_SIE {Jak : ['Prztula, bawi się i karmi']}] ->(Pies)
+CREATE (Człowiek)- [:OPIEKUJE_SIE {Jak : ['Jak najlepiej']}] ->(Małpa)
+CREATE (Człowiek)- [:JE {Kiedy : ['Jak ma ochotę na mięsko']}] ->(Krowa)
+CREATE (Człowiek)- [:JE {Kiedy : ['Jak chciałby polędwice']}] ->(Świnia)
+CREATE (Człowiek)- [:JE {Kiedy : ['Jak jest piątek']}] ->(Ryby)
+
+CREATE (Człowiek)- [:POLUJE_NA {Po_co : ['Bo chciałby futerko']}] ->(Tygrys)
+CREATE (Człowiek)- [:POLUJE_NA {Po_co : ['Bo mu zjada kury']}] ->(Wilk)
+
+
+CREATE
+	(Misiek)-[:JE {Kiedy : 'Kiedy jest glodny'}]->(Ryby),
+    (Misiek)-[:JE {Kiedy : 'Kiedy boli go brzuch'}]->(Trawa),
+    (Tygrys)-[:JE {Kiedy : 'Kiedy zaatakuje'}]->(Człowiek),
+    (Ślimaki)-[:JE {Kiedy : 'Kiedy jest głodny'}]->(Mniszek),
+    (Zając)-[:JE {Kiedy : 'Kiedy kica po łące'}]->(Trawa),
+    (Zając)-[:JE {Kiedy : 'Kiedy kica po lesie'}]->(Mniszek),
+    (Mysz)-[:JE {Kiedy : 'Kiedy go zauważy'}]->(Ślimaki),
+    (Kotek)-[:JE {Kiedy : 'Kiedy dostanie od człowieka'}]->(Mleko),
+    (Kotek)-[:JE {Kiedy : 'Kiedy upoluje'}]->(Mysz)
+
+Create (Wydra)-[:JE {Kiedy : 'Kiedy pływa', Ile : 'Dużo'}]->(Ryby),
+	(Wydra)-[:JE {Kiedy: 'Kiedy jest na lądzie'}]->(Ślimaki),
+    	(Wydra)-[:JE {Kiedy: 'W trakcie nocy'}]->(Mysz);
+
+CREATE (Misio : Wszystkożerne {Nazwa:'Misio', Łacińska_nazwa : 'Ursus arctos', Kontynent : 'Północna Ameryka', Długość_ciała: 200, Waga : 200})
+MATCH (n { Nazwa: 'Misio' })
+SET n.Nazwa = 'Niedzwiedz'
+RETURN n.Nazwa
+
+
+MATCH (n { Nazwa: 'Niedzwiedz' })
+delete n
+
+match (n) detach delete n
+
+
+-------------------
+pytanka
+-------------------
+1)Czym żywi się mysz? 
+  match(n:Roślinożerne)-[r:JE]->(m) where n.Nazwa = 'Mysz ziemista' return n, r, m;
+
+2)Jakie zwierzę żywi się rybami?
+  match(n)-[r:JE]->(m) where m.Nazwa = 'Rybki' return n,r,m;
+
+3)Czy jakieś zwierzę zjada kota?
+  match(n)-[r:JE]->(m) where m.Nazwa ='Kot pustynny' return n;
+
+4)Czy człowiek żywi się myszą?
+  match(n)-[r:JE]->(m) where n.Nazwa ='Człowiek' and m.Nazwa ='Mysz ziemista' return n;
+
+5)Jakie zwierzęta produkują mleko?
+  match(n)-[r:PRODUKUJE]->(m) where m.Nazwa = 'Mleko' return n,r,m;
+
+6)Na jakich zwierzętach kleszcz pasożytuje?
+  match(n)-[r:`PASOŻYTUJE_NA`]->(m) where n.Nazwa = "Kleszcz" return n,r,m;
+
+7)Czym odżywia się ślimak?
+  match(n)-[r:JE]->(m) where n.Nazwa = 'Ślimak' return n,r,m
+
+8)Co zjada mniszka lekarskiego?
+  match(n)-[r:JE]->(m) where m.Nazwa = 'Mniszek Lekarski' return n,r,m
+
+9)Podaj mi wszystkie łańcuchy które kończą się produkowanym elementem
+  match (n)-[:JE]-> (m) -[:JE]->(l) , (l)-[:PRODUKUJE]->(f) return n,m,l,f
+
+10)Podaj mi pary mięsożerców które jedzą to samo
+  match (n:`Mięsożerne`)-[:JE]->(m)<-[:JE]-(k:`Mięsożerne`) return k ,m, n
+
+11)Podaj mi 3 największych konsumentów z bazy danych
+  match (n)-[r:JE]->(m) return n.Nazwa, count(*) as ilosc_jedzenia Order by ilosc_jedzenia DESC LIMIT 3
