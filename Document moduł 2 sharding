@@ -1,0 +1,79 @@
+with 3 shards
+primary shard being a replica set with three members (2 ordinary, 1 arbiter)
+other shards and configuration server being single member replica sets.
+In the database created this way add three collections:
+
+one unsharded
+one distributed between non-primary shards
+one sharded using hashed sharding.
+
+
+
+1) Odpalenie Serwera Konfiguracyjnego :
+mongod --configsvr --port 27020 --dbpath data\config --replSet confSet
+
+2) inicjacja serwera Konfiguracji
+mongo --port 27020
+rs.initiate({_id:"confSet", configsvr:true, members:[{_id:0, host:"127.0.0.1:27020"}]})
+
+3) Włączenie Serwerów dla Shardów (Na nowym CMD)
+        X3
+          mongod --shardsvr --replSet shard1Set --dbpath data\sh1 --port 27021
+          mongod --shardsvr --replSet shard2Set --dbpath data\sh2 --port 27022
+          mongod --shardsvr --replSet shard3Set --dbpath data\sh3 --port 27023
+
+4) Inicjacja Shardów
+    X3
+      mongo -port 27023
+      rs.initiate({_id:"shard3Set", members:[{_id:0, host:"127.0.0.1:27023"}]})
+    use ourBase
+
+5)    Utworzenie Replik :
+        mongod --port 27024 --dbpath data\db1 --replSet shard2Set
+        mongod --port 27025 --dbpath data\db2 --replSet shard2Set
+
+
+
+6) Odpalamy Ruter i dodajemy mu shardy
+mongos --configdb confSet/127.0.0.1:27020
+mongo
+      sh.addShard("shard1Set/127.0.0.1:27021")
+      sh.addShard("shard2Set/127.0.0.1:27022")
+      sh.addShard("shard3Set/127.0.0.1:27023")
+
+7) wracamy do shardów i sprawdzamy który z nich jest primary i tam dodajemy węzły
+          rs.add("127.0.0.1:27024")
+          rs.addArb("127.0.0.1:27025")
+          use ourBase
+8) Zezwalamy na Sharding naszej bazy
+      sh.enableSharding("ourBase")
+      use ourBase
+
+9) odpalamy mongos i wrzucamy zwyczajnie dane
+    db.col1.insert({agasd:"rsd", g:3})
+    db.col1.insert({asds:"hjf", g:[3]})
+    db.col1.insert({fdgh:"sghg", g:[[3]]})
+10) łączymy shardy w zony
+    sh.addShardToZone("shard2Set", "Zone1")
+    sh.addShardToZone("shard1Set", "Zone2")
+    sh.addShardToZone("shard3Set", "Zone2")
+
+11) cała kolekcja 2 trafia do Zone2
+    sh.updateZoneKeyRange("ourBase.col2",{a: MinKey},{a: MaxKey},"Zone2")
+    sh.shardCollection("ourBase.col2",{a:1})
+    db.col2.insert({a:"aaa", b:"bbb", d:5})
+    db.col2.insert({a:"eee", b:"fff", z:[5]})
+    db.col2.insert({a:"iii", b:"jjj", d:"z"})
+    db.col2.insert({a:"nnn", b:"ooo"})
+
+12) Wrzucamy dane do Haszowanej kolekcji
+
+sh.shardCollection("ourBase.col3",{atr:"hashed"})
+
+    db.col3.insert({atr:"a"})
+    db.col3.insert({atr:"c"})
+    db.col3.insert({atr:"e"})
+    db.col3.insert({atr:"f"})
+    db.col3.insert({atr:"h"})
+    db.col3.insert({atr:"j"})
+    db.col3.insert({atr:"l"})
