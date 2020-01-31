@@ -1,0 +1,100 @@
+Zadanie 1
+
+//Załadowanie danych
+db.cities.insertMany([{
+city: "Arnoldów",
+population: 345,
+reachable_from:
+[
+{city: "Arnoldów", distance:34},
+{city: "Kałużów", distance:2}
+]
+},
+{
+city: "Pacynków",
+population: 2,
+reachable_from:
+[
+{city: "Arnoldów", distance:5},
+{city: "Kałużów", distance:17},
+{city: "Mrzawków", distance:4}
+]
+},
+{
+city: "Kałużów",
+population: 100000,
+reachable_from:
+[
+{city: "Mrzawków", distance: 12},
+{city: "Pacynków", distance: 23}
+]
+},
+{
+city: "Mrzawków",
+population: 6727,
+reachable_from:
+[
+{city: "Pacynków", distance:11}
+]
+}
+])
+
+1.a
+db.cities.find({city:"Pacynków" , "reachable_from.city" : "Kałużów"} , {_id:0,city:1,"reachable_from.$.city":1,"reachable_from.distance":1})
+db.cities.find({city:"Pacynków" , "reachable_from.city" : "Kałużów"} , {_id:0,"reachable_from.$.distance":1})
+
+
+1.b
+db.cities.updateOne({city:"Pacynków"}, {$push:{reachable_from:{city : "Pacynków",distance : 40 }}})
+
+1.c tu podobno bez UnWind
+db.cities.aggregate([{$unwind: "$reachable_from"} , {$match:{"reachable_from.city":"Pacynków"}} , {$group:{_id:"$reachable_from.city",population:{$sum:"$population"}}}])
+
+
+2
+db.albums.insertMany([{
+artist: "Bonjo",
+album: "Banjo",
+tracks:
+[
+{title: "bip", length: 3.45},
+{title: "bop", length: 2.17, guest: "Rock"},
+{title: "bap", length: 4.05, guest: "Short"}
+]
+},
+{
+artist: "Rock",
+album: "Roll",
+tracks:
+[
+{title: "Jail", length: 4.56, guest: "Big Bad"},
+{title: "House", length: 8.97},
+{title: "Rock", length: 2.34}
+]
+},
+{
+artist: "Big Bad",
+album: "Wolf",
+tracks:
+[
+{title: "Little", length: 1.11, guest: "Bonjo"},
+{title: "Red", length: 2.77},
+{title: "Riding", length: 5.13},
+{title: "Hood", length: 4.05}
+]
+},
+{
+artist: "Short",
+album: "Track",
+tracks:
+[
+{title: "100m", length: 10.00},
+{title: "200m", length: 20.00, guest: "Big Bad"}
+]
+}])
+2.1
+db.albums.find({"tracks.guest":"Big Bad"} , {_id:0 ,artist:1 })
+2.2
+db.albums.updateOne({"tracks.title":"100m"} , {$set :{"tracks.$.guest":"Bonjo"}})
+2.3
+db.albums.aggregate([{$unwind:"$tracks"},{$match:{$or:[{artist:"Bonjo"},{"tracks.guest":"Bonjo"}]}},{$group:{_id:null,length:{$sum:"$tracks.length"}}}])
