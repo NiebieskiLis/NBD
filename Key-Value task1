@@ -1,0 +1,62 @@
+{
+"Name" : "Fa_Mulan",
+"Movie" : "Mulan",
+"Produced_by" : "Walt_Disney",
+"Animal" : "Mushu",
+"year" : 1998
+},
+{
+"Name" : "Anastasia",
+"Movie" : "Anastasia",
+"Produced_by" : "Fox_Animation_Studio",
+"Animal" : "Mucha",
+"year" : 1997
+},
+{
+"Name" : "Pocahontas",
+"Movie" : "Pocahontas",
+"Produced_by" : "Walt_Disney",
+"Animal" : ["Meeko","Flit","Percy"],
+"year" : 1995
+}
+
+Main Key is Movie and Alternative one is Produced_by
+as objects:
+put -key /Mulan -value { "Name" : "Fa_Mulan", "Produced_by" : "Walt_Disney","Animal" : "Mushu","year" : 1998}
+put -key /Pocahontas -value { "Name" : "Pocahontas", "Produced_by" : "Walt_Disney", "Animal" : ["Meeko","Flit","Percy"],"year" : 1995 }
+put -key /Anastasia -value { "Name" : "Anastasia", "Produced_by" : "Fox_Animation_Studio", "Animal" : "Mucha", "year" : 1997}
+IndexView Key-Value
+Adding Mulan
+put -key /ProducerIV/Walt_Disney - value ["Mulan"]
+Adding Pocahontas
+get -key /ProducerIV/Walt_Disney //should return ["Mulan"]
+put -key /ProducerIV/Walt_Disney - value ["Mulan","Pocahontas"]
+Adding Anastazji
+get -key /ProducerIV/Fox_Animation_Studio //nothing to return yet
+put -key /ProducerIV/Fox_Animation_Studio - value ["Anastasia"]
+
+As atomic values
+//Mulan
+
+put -key Mulan/-/Name : "Fa_Mulan"
+put -key Mulan/-/Produced_by : "Walt_Disney"
+put -key Mulan/-/Animal : "Mushu"
+put -key Mulan/-/year : 1998
+//Anastasia
+
+put -key Anastasia/-/Name : "Anastasia"
+put -key Anastasia/-/Produced_by : "Fox_Animation_Studio"
+put -key Anastasia/-/Animal : "Mucha"
+put -key Anastasia/-/year : 1997
+
+//Anastasia
+
+put -key Pocahontas/-/Name : "Pocahontas"
+put -key Pocahontas/-/Produced_by : "Walt_Disney"
+put -key Pocahontas/-/Animal : ["Meeko","Flit","Percy"]
+put -key Pocahontas/-/year : 1995
+
+IndexView key-only  -Tu był błąd ale chyba już poprawiony
+put -key ProducerIV/Walt_Disney/-/Mulan : ""
+put -key ProducerIV/Walt_Disney/-/Pocahontas : ""
+put -key ProducerIV/Fox_Animation_Studio/-/Anastasia : ""
