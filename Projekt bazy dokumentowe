@@ -1,1 +1,211 @@
+Konfiguracja Mongo
+//cmd1
+mongod --configsvr --port 2020 --dbpath data/config --replSet confSet
 
+//cmd3
+mongod --shardsvr --replSet shard1Set --dbpath data/sh1 --port 2021
+
+//cmd4
+mongod --shardsvr --replSet shard2Set --dbpath data/sh2 --port 2022
+
+//cmd6
+mongod --shardsvr --port 2023 --dbpath data/rep1 --replSet shard1Set
+
+//cmd6
+mongod --shardsvr --port 2025 --dbpath data/rep2 --replSet shard2Set
+
+-----
+
+mongo --port 2020
+rs.initiate({_id:"confSet", configsvr:true, members:[{_id:0, host:"localhost:2020"}]})
+
+mongo -port 2021
+rs.initiate({_id:"shard1Set", members:[{_id:0, host:"localhost:2021"}]})
+
+mongo -port 2022
+rs.initiate({_id:"shard2Set", members:[{_id:0, host:"localhost:2022"}]})
+
+
+//cmd11
+mongos --configdb confSet/localhost:2020
+
+//cmd12 laczymy sie z routerem
+mongo
+
+-----
+
+sh.addShard("shard1Set/localhost:2021")
+sh.addShard("shard2Set/localhost:2022")
+sh.addShard("shard1Set/localhost:2023")
+sh.addShard("shard2Set/localhost:2025")
+
+sh.enableSharding("myBase")
+use myBase
+sh.status()
+
+2021
+rs.add("localhost:2023")
+
+2022
+rs.add("localhost:2025")
+
+
+use myBase
+
+sh.shardCollection("myBase.wiezienia",{nr_zakladu:'hashed'})
+
+db.wiezienia.insertMany([{
+  nr_zakladu : 1,
+  nazwa : "Młodociany zakład poprawczy",
+  rok_powstania: 1997,
+  rygor : "mały",
+  system : "programowanego oddziaływania",
+  rodzaj:"zakłady dla młodocianych",
+  typ: "półotwarty"
+},
+
+{
+  nr_zakladu : 2,
+  nazwa : "Zakład Karny w Drublu",
+  rok_powstania: 2011,
+  rygor : "zaostrzony",
+  system : "zwykłym",
+  rodzaj:"zakłady dla recydywistów penitencjarnych",
+  typ: "zamkniętego"
+},
+
+{
+  nr_zakladu : 3,
+  nazwa : "Zakład penitencjarny w Krakowie",
+  rok_powstania: 2000,
+  rygor : "mały",
+  system : "terapeutyczny",
+  rodzaj:"zakład dla odbywających karę po raz pierwszy",
+  typ: "otwartego"
+}])
+
+
+
+db.wiezniowie.insertMany([{
+  pesel:"83012007843",
+  imie:"Antoni",
+  nazwisko:"Drapak",
+  data_urodzenia:"12/01/1983",
+  kara :
+    {
+      nr_zakladu : 3,
+      dlugosc_wyroku : 25,
+      kategoria_zbrodni : "Morderstwo",
+      data_rozpoczecia : "15/04/2003"
+    }
+},
+{
+  pesel:"05250702345",
+  imie:"Mikolaj",
+  nazwisko:"Raczyk",
+  data_urodzenia:"07/5/2005",
+  kara :
+    {
+      nr_zakladu : 1,
+      dlugosc_wyroku : 3,
+      kategoria_zbrodni : "Paserstwo",
+      data_rozpoczecia : "15/04/2018"
+    }
+},
+{
+  pesel:"95110702345",
+  imie:"Fiona",
+  nazwisko:"Krzewska",
+  data_urodzenia:"07/11/1995",
+  kara :
+    {
+      nr_zakladu : 1,
+      dlugosc_wyroku : 2,
+      kategoria_zbrodni : "Kradzież",
+      data_rozpoczecia : "07/01/2020"
+    }
+},
+{
+  pesel:"87061107843",
+  imie:"Alicja",
+  nazwisko:"Krawczyk",
+  data_urodzenia:"11/06/1987",
+  kara :
+    {
+      nr_zakladu : 3,
+      dlugosc_wyroku : 15,
+      kategoria_zbrodni : "Morderstwo",
+      data_rozpoczecia : "13/09/2007"
+    }
+},
+{
+  pesel:"93121207843",
+  imie:"Andrzej",
+  nazwisko:"Karpik",
+  data_urodzenia:"12/12/1993",
+  kara :
+    {
+      nr_zakladu : 3,
+      dlugosc_wyroku : 17,
+      kategoria_zbr
+      odni : "Kradzież",
+      data_rozpoczecia : "15/04/2008",
+      zwolnienie_waruknowe : "15/04/2019"
+    }
+}])
+
+
+------------------------------------
+5 queries
+------------------------------------
+db.wiezniowie.find({"kara.dlugosc_wyroku" :{$gt : 5}}, {_id:0,imie:1 , nazwisko:1 , "kara.dlugosc_wyroku":1})
+
+db.wiezniowie.find({"kara.zwolnienie_waruknowe":{$exists:true}},{_id:0,pesel:1,imie:1 , nazwisko:1 , "kara.zwolnienie_waruknowe":1})
+
+
+db.wiezniowie.aggregate([
+  {
+    $set : {
+      "kara.zwolnienie_waruknowe":"17/01/2020"
+    }
+  },
+  {
+    $match : {imie:"Alicja", nazwisko:"Krawczyk"}
+  }
+])
+
+
+db.wiezienia.aggregate({
+    $lookup : {
+        from: "wiezniowie",
+        localField: "nr_zakladu",
+        foreignField: "kara.nr_zakladu",
+        as: "newLookup"
+    }
+} , {
+  $project : {
+  _id:0,
+    nr_zakladu:1 ,
+    nazwa:1 ,
+    "newLookup.imie":1,
+    "newLookup.nazwisko":1}
+});
+
+
+
+
+
+db.wiezienia.aggregate({
+  $lookup : {
+      from: "wiezniowie",
+      localField: "nr_zakladu",
+      foreignField: "kara.nr_zakladu",
+      as: "newLookup"
+  },
+},{
+  $match: {system:"terapeutyczny"},
+},{$unwind:"$newLookup"},{
+  $count : "Ilość osob w zakladzie terapeutycznym"
+  })
+
+  db.wiezniowie.aggregate({ $group : { _id: "$name", max: { $max : "$kara.dlugosc_wyroku" }}});
